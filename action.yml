@@ -31,7 +31,10 @@ runs:
         "sha=$sha" >> $env:GITHUB_OUTPUT
 
     - name: Configure remoting for Ansible
-      shell: pwsh
+      # Windows PowerShell 5.1, not pwsh: the upstream script's X509Certificate.Import
+      # call relies on a mutable certificate object that .NET Core (pwsh) rejects with
+      # "X509Certificate is immutable on this platform."
+      shell: powershell
       env:
         SCRIPT_SHA: ${{ steps.resolve-sha.outputs.sha }}
       run: |
