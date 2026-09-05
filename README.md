@@ -61,6 +61,12 @@ Windows only (`windows-latest`, `windows-2022`, `windows-2025`, etc). The action
 
 The upstream script lives on a `devel` branch with no version tags, so a bare link to it can change behavior underneath a workflow without warning. Pinning to a specific commit SHA keeps CI runs reproducible: the same `sha` input always downloads the exact same script. When ansible/ansible-documentation ships a new revision worth adopting, bump the default SHA in `action.yml` in a dedicated PR, rather than letting it drift silently.
 
+## Explanation: why an action instead of copy-pasting the step
+
+The inlined version of this step is four lines of PowerShell repeated in every workflow that needs it, which looks cheap until the SHA needs to move. At that point it's a grep-and-replace across every repo and workflow file that copied it, with no guarantee every copy is even in sync, versus bumping `action.yml` once here and letting consumers pick it up on their own schedule by moving their `@v1` pin.
+
+It also collapses the diff a reviewer has to read. `uses: lowlysre/config-ansible-remote-action@v1` says what the step does; four lines of `ScriptBlock`/`WebClient` plumbing says how, and a reviewer unfamiliar with the Ansible remoting script has to go read it to know it's not doing anything else. Centralizing it here also means `.github/workflows/test.yml` is the one place this actually gets exercised on `windows-2025`, instead of every consumer's copy being an untested assumption that it still works.
+
 ## License
 
 [MIT](LICENSE)
