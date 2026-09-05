@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure WinRM for Ansible
-        uses: lowlysre/config-ansible-remote-action@v1
+        uses: lowlysre/config-ansible-remote-action@v1.0.0
 
       - name: Run ansible-test
         run: ansible-test integration
@@ -34,7 +34,7 @@ By default the action uses the SHA baked into `action.yml`. Pass `sha` to overri
 
 ```yaml
 - name: Configure WinRM for Ansible
-  uses: lowlysre/config-ansible-remote-action@v1
+  uses: lowlysre/config-ansible-remote-action@v1.0.0
   with:
     sha: 1234567890abcdef1234567890abcdef12345678
 ```
@@ -63,9 +63,9 @@ The upstream script lives on a `devel` branch with no version tags, so a bare li
 
 ## Explanation: why an action instead of copy-pasting the step
 
-The inlined version of this step is four lines of PowerShell repeated in every workflow that needs it, which looks cheap until the SHA needs to move. At that point it's a grep-and-replace across every repo and workflow file that copied it, with no guarantee every copy is even in sync, versus bumping `action.yml` once here and letting consumers pick it up on their own schedule by moving their `@v1` pin.
+The inlined version of this step is four lines of PowerShell repeated in every workflow that needs it, which looks cheap until the SHA needs to move. At that point it's a grep-and-replace across every repo and workflow file that copied it, with no guarantee every copy is even in sync, versus bumping `action.yml` once here and letting consumers pick it up on their own schedule by moving their `@v1.0.0` pin.
 
-It also collapses the diff a reviewer has to read. `uses: lowlysre/config-ansible-remote-action@v1` says what the step does; four lines of `ScriptBlock`/`WebClient` plumbing says how, and a reviewer unfamiliar with the Ansible remoting script has to go read it to know it's not doing anything else. Centralizing it here also means `.github/workflows/test.yml` is the one place this actually gets exercised on `windows-2025`, instead of every consumer's copy being an untested assumption that it still works.
+It also collapses the diff a reviewer has to read. `uses: lowlysre/config-ansible-remote-action@v1.0.0` says what the step does; four lines of `ScriptBlock`/`WebClient` plumbing says how, and a reviewer unfamiliar with the Ansible remoting script has to go read it to know it's not doing anything else. Centralizing it here also means `.github/workflows/test.yml` is the one place this actually gets exercised, across every Windows runner image (`windows-2022`, `windows-2025`) and with the resulting WinRM listener checked, instead of every consumer's copy being an untested assumption that it still works.
 
 ## License
 

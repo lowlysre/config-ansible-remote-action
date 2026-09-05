@@ -8,9 +8,23 @@ permissions: {}
 
 jobs:
   test:
-    runs-on: windows-2025
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure WinRM for Ansible
         uses: ./
+
+      - name: Verify WinRM listener
+        shell: pwsh
+        run: |
+          $listeners = winrm enumerate winrm/config/Listener
+          if ($LASTEXITCODE -ne 0 -or $listeners -notmatch 'Transport = HTTPS') {
+            Write-Error "No HTTPS WinRM listener found:`n$listeners"
+            exit 1
+          }
+          Test-WSMan -ComputerName localhost -UseSSL -ErrorAction Stop
