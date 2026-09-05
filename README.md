@@ -55,7 +55,10 @@ None.
 
 ### Runner requirements
 
-Windows only (`windows-latest`, `windows-2022`, `windows-2025`, etc). The action shells out with `pwsh`.
+Windows only (`windows-latest`, `windows-2022`, `windows-2025`, etc).
+
+> [!IMPORTANT]
+> The remoting step runs under Windows PowerShell 5.1 (`shell: powershell`), not `pwsh`. `ConfigureRemotingForAnsible.ps1`'s cert-import call throws `X509Certificate is immutable on this platform` under `pwsh` 7.x, since .NET 7+ dropped the mutable `X509Certificate2` constructor it needs. This is an upstream limitation in the script, not something this action's `sha` input can work around.
 
 ## Explanation: why pin a SHA at all
 
