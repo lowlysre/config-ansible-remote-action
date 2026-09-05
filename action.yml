@@ -1,0 +1,43 @@
+name: "Configure WinRM for Ansible"
+description: "Configures PowerShell remoting (WinRM) on a Windows runner so Ansible can connect to it over localhost."
+author: "lowlysre"
+branding:
+  icon: "terminal"
+  color: "blue"
+
+inputs:
+  sha:
+    description: >
+      Commit SHA of ansible/ansible-documentation to pin ConfigureRemotingForAnsible.ps1 to.
+      Use "latest" to use the SHA currently bundled with this action.
+    required: false
+    default: "latest"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Resolve script SHA
+      id: resolve-sha
+      shell: pwsh
+      env:
+        INPUT_SHA: ${{ inputs.sha }}
+      run: |
+        # Default pinned SHA is updated deliberately; see README for update process.
+        $defaultSha = "b8cf495929aa200a11abc7468d1fb6cd9c0e1613"
+        $sha = $env:INPUT_SHA
+        if ([string]::IsNullOrWhiteSpace($sha) -or $sha -eq "latest") {
+          $sha = $defaultSha
+        }
+        "sha=$sha" >> $env:GITHUB_OUTPUT
+
+    - name: Configure remoting for Ansible
+      # Windows PowerShell 5.1, not pwsh: the upstream script's X509Certificate.Import
+      # call relies on a mutable certificate object that .NET Core (pwsh) rejects with
+      # "X509Certificate is immutable on this platform."
+      shell: powershell
+      env:
+        SCRIPT_SHA: ${{ steps.resolve-sha.outputs.sha }}
+      run: |
+        $url = "https://raw.githubusercontent.com/ansible/ansible-documentation/$env:SCRIPT_SHA/examples/scripts/ConfigureRemotingForAnsible.ps1"
+        $sb = [ScriptBlock]::Create((New-Object System.Net.WebClient).DownloadString($url))
+        & $sb -Verbose -ForceNewSSLCert 4>&1

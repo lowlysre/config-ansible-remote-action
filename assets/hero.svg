@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="220" viewBox="0 0 960 220" role="img" aria-labelledby="title desc">
+  <title id="title">Configure WinRM for Ansible</title>
+  <desc id="desc">A GitHub Action that configures PowerShell remoting on a Windows runner for Ansible.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#1f2a44"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L6,3 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="960" height="220" rx="16" fill="url(#bg)"/>
+
+  <!-- Windows-ish logo mark -->
+  <g transform="translate(48,60)">
+    <rect x="0" y="0" width="44" height="44" fill="#4fc3f7"/>
+    <rect x="52" y="0" width="44" height="44" fill="#4fc3f7"/>
+    <rect x="0" y="52" width="44" height="44" fill="#4fc3f7"/>
+    <rect x="52" y="52" width="44" height="44" fill="#4fc3f7"/>
+  </g>
+
+  <!-- Connector arrow -->
+  <line x1="170" y1="110" x2="250" y2="110" stroke="#8b949e" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Ansible-ish A mark -->
+  <g transform="translate(270,55)">
+    <circle cx="45" cy="45" r="45" fill="#1f2a44" stroke="#e01e5a" stroke-width="4"/>
+    <path d="M45 20 L65 70 L57 70 L52.5 58 L37.5 58 L33 70 L25 70 Z M45 32 L39 50 L51 50 Z" fill="#ffffff"/>
+  </g>
+
+  <text x="410" y="95" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="34" fill="#f0f6fc" font-weight="600">
+    Configure WinRM for Ansible
+  </text>
+  <text x="410" y="130" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#8b949e">
+    Enable PowerShell remoting on Windows runners in one step.
+  </text>
+</svg>

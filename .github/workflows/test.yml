@@ -1,0 +1,44 @@
+name: Test action
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Configure WinRM for Ansible
+        uses: ./
+
+      - name: Verify WinRM listener
+        shell: pwsh
+        run: |
+          $listeners = winrm enumerate winrm/config/Listener | Out-String
+          if ($LASTEXITCODE -ne 0 -or $listeners -notmatch 'Transport = HTTPS') {
+            Write-Error "No HTTPS WinRM listener found:`n$listeners"
+            exit 1
+          }
+
+          # The listener uses a self-signed cert, so skip cert validation here; this only
+          # proves the HTTPS listener accepts a TLS handshake and answers WS-Man requests,
+          # not that Ansible's own cert trust would succeed unmodified.
+          try {
+            Invoke-WebRequest -Uri 'https://localhost:5986/wsman' -SkipCertificateCheck -UseBasicParsing -ErrorAction Stop
+            Write-Error "Expected the WS-Man endpoint to reject a bare GET with 405, but it returned 200."
+            exit 1
+          } catch [Microsoft.PowerShell.Commands.HttpResponseException] {
+            if ($_.Exception.Response.StatusCode -ne 405) {
+              Write-Error "Expected HTTP 405 from the WS-Man endpoint, got $($_.Exception.Response.StatusCode)."
+              exit 1
+            }
+            Write-Output "WS-Man endpoint answered as expected (405 Method Not Allowed)."
+          }
