@@ -22,7 +22,7 @@ jobs:
       - name: Verify WinRM listener
         shell: pwsh
         run: |
-          $listeners = winrm enumerate winrm/config/Listener
+          $listeners = winrm enumerate winrm/config/Listener | Out-String
           if ($LASTEXITCODE -ne 0 -or $listeners -notmatch 'Transport = HTTPS') {
             Write-Error "No HTTPS WinRM listener found:`n$listeners"
             exit 1
